@@ -14,7 +14,7 @@ Server::Server(QObject *parent) : QObject(parent)
     db.setPassword("123456");
     if(!db.open())
         exit(1);
-
+`
     //监听客户端信号
     server.listen (QHostAddress::Any, 10999);
 
@@ -57,9 +57,6 @@ void Server::onPostReady(HttpServerRequest &request, HttpServerResponse &respons
     ...
 }
 */
-    qDebug() << "data from client" << data;
-
-
     QJsonDocument doc = QJsonDocument::fromJson(data);
     //获取JSON根节点
     QJsonObject root = doc.object();
@@ -77,7 +74,7 @@ void Server::onPostReady(HttpServerRequest &request, HttpServerResponse &respons
     }
     else if(cmd == "nearbyDriver")
     {
-        resp = nearbyDrivers(root);
+        resp == nearbyDrivers(root);
     }
     else
     {
@@ -90,8 +87,6 @@ void Server::onPostReady(HttpServerRequest &request, HttpServerResponse &respons
         QJsonDocument doc(resp);
         QByteArray buf = doc.toJson();
         response.end(buf);      //发给客户端
-
-        qDebug() << "buf back to client" << buf;
     }
 }
 
@@ -316,14 +311,8 @@ QJsonObject Server::nearbyDrivers(const QJsonObject &req)
     for(int i=0; i<(int)(sizeof(offsetGeohash)/sizeof(offsetGeohash[0])); ++i)
     {
         int geokey = geohash + offsetGeohash[i];
-
-        qDebug() << "nearbyDrivers geokey=" << geokey;
-        qDebug() << "driversList";
-
         //获取当前区域的所有司机名字
         QStringList driversList = redis.getSet(QString::number(geokey));
-
-        qDebug() << "driversList.size()=" << driversList.size();
 
         //遍历司机列表，从用户的集合中提取详细信息，放到QJsonArray中
         foreach(QString driverName, driversList)
